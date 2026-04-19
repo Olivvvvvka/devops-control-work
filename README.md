@@ -33,7 +33,8 @@
 ┌──────┴──────┐
 │ Парсер │ ← Open-Meteo + Gismeteo (mock)
 └─────────────┘
-<img width="974" height="1307" alt="image" src="https://github.com/user-attachments/assets/ad9cf81f-eccf-4d1d-a7e6-3bfb8ff5b8a5" />
+<img width="1238" height="1105" alt="image" src="https://github.com/user-attachments/assets/dc8fc214-1d37-47f7-834e-219e238fc139" />
+
 
 ## 📦 Компоненты
 | Сервис | Технология | Порт |
