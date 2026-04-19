@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpass
+      POSTGRES_DB: weather_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d weather_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+
+  metabase:
+    image: metabase/metabase:v0.49.0
+    ports:
+      - "3001:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: weather_db
+      MB_DB_HOST: postgres
+      MB_DB_PORT: 5432
+      MB_DB_USER: admin
+      MB_DB_PASS: adminpass
+      MB_JETTY_HOST: 0.0.0.0
+    depends_on:
+      - postgres
+
+  webapp:
+    build: ./webapp
+    depends_on:
+      - postgres
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - webapp
+      - pgadmin
+      - metabase
+
+  parser:
+    build: ./parser
+    depends_on:
+      - postgres
+    command: ["python", "src/parser.py"]
+
+volumes:
+  postgres_data:
